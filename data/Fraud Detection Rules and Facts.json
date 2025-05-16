@@ -1,0 +1,85 @@
+{
+  "rules": [
+    {
+      "name": "High Transaction Amount",
+      "conditions": {
+        "all": [
+          {
+            "fact": "transactionAmount",
+            "operator": "greaterThanInclusive",
+            "value": 10000
+          },
+          {
+            "fact": "accountType",
+            "operator": "equal",
+            "value": "personal"
+          }
+        ]
+      },
+      "event": {
+        "type": "flagTransaction",
+        "params": {
+          "message": "High transaction amount detected for personal account!",
+          "severity": "high"
+        }
+      }
+    },
+    {
+      "name": "Rapid Transaction Frequency",
+      "conditions": {
+        "all": [
+          {
+            "fact": "transactionsInLastHour",
+            "operator": "greaterThanInclusive",
+            "value": 5
+          },
+          {
+            "fact": "totalAmountInLastHour",
+            "operator": "greaterThanInclusive",
+            "value": 5000
+          }
+        ]
+      },
+      "event": {
+        "type": "flagTransaction",
+        "params": {
+          "message": "Multiple high-value transactions in a short period!",
+          "severity": "medium"
+        }
+      }
+    },
+    {
+      "name": "Suspicious Location",
+      "conditions": {
+        "any": [
+          {
+            "fact": "transactionCountry",
+            "operator": "notEqual",
+            "value": "accountHolderCountry"
+          },
+          {
+            "fact": "isNewDevice",
+            "operator": "equal",
+            "value": true
+          }
+        ]
+      },
+      "event": {
+        "type": "flagTransaction",
+        "params": {
+          "message": "Transaction from unusual location or new device!",
+          "severity": "medium"
+        }
+      }
+    }
+  ],
+  "facts": {
+    "transactionAmount": 12000,
+    "accountType": "personal",
+    "transactionsInLastHour": 6,
+    "totalAmountInLastHour": 7500,
+    "transactionCountry": "FR",
+    "accountHolderCountry": "US",
+    "isNewDevice": true
+  }
+}
