@@ -62,11 +62,11 @@ actions:
       # Create a new development task
       
       I'll create a new task with:
-      - Unique task ID (TASK-YYYY-MM-DD-NN format)
+      - Unique task ID (TASK-YYYY-MM-DD-NN format, where YYYY-MM-DD must be the current date)
       - Description section
       - Relevant specifications section (linked to `.cursor/specs/` managed by the specification_management rule)
       - Acceptance criteria section
-      - Metadata (ID, start date, end date, state)
+      - Metadata (ID, start date must be the current date, end date, state)
       - Learnings section for capturing implementation insights
       
       The task will be stored in `.cursor/tasks/` with an Open (📝) status

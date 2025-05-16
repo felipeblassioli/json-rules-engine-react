@@ -60,11 +60,11 @@ actions:
       # Create a new learning entry
       
       I'll create a structured learning document with:
-      - Unique ID (format: LEARN-YYYY-MM-DD-NN)
+      - Unique ID (format: LEARN-YYYY-MM-DD-NN, where YYYY-MM-DD must be the current date)
       - Title and short description
       - Detailed description of the learning
       - Relevant code files, tasks (managed by development_workflow_system), specifications (managed by specification_management), and documents
-      - Date of capture
+      - Date of capture (must be the current date)
       - Keywords for easy retrieval
       
       The learning will be stored in `.cursor/learnings/` 
