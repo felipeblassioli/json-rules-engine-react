@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback, ChangeEvent, FormEvent } from 'react';
-import { Engine, Rule as EngineRule, Fact as EngineFact } from 'json-rules-engine';
+import React, { useState, useEffect, useCallback, type ChangeEvent } from 'react';
+import { Engine, type Rule as EngineRule } from 'json-rules-engine';
 import {
   FaPlus,
   FaEdit,
@@ -63,7 +63,8 @@ interface ToastState {
 
 // --- Utility Functions ---
 
-const generateUniqueId = () => Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+const generateUniqueId = () =>
+  Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 
 // Converts UI-friendly conditions (with _id) to json-rules-engine format (without _id)
 const cleanConditionsForEngine = (
@@ -72,9 +73,10 @@ const cleanConditionsForEngine = (
   if ('fact' in uiConditions) {
     const { _id, isValid, errorMessage, ...rest } = uiConditions;
     // Attempt to parse value to number if it looks like one, otherwise keep as string
-    const value = typeof rest.value === 'string' && !isNaN(Number(rest.value)) && rest.value.trim() !== ''
-      ? Number(rest.value)
-      : rest.value;
+    const value =
+      typeof rest.value === 'string' && !isNaN(Number(rest.value)) && rest.value.trim() !== ''
+        ? Number(rest.value)
+        : rest.value;
     return { ...rest, value };
   } else {
     const { _id, isValid, errorMessage, children, operator } = uiConditions;
@@ -171,9 +173,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, footer,
             <FaTimes size={20} />
           </button>
         </div>
-        <div className="p-6 max-h-[70vh] overflow-y-auto">
-          {children}
-        </div>
+        <div className="p-6 max-h-[70vh] overflow-y-auto">{children}</div>
         {footer && (
           <div className="p-4 border-t border-gray-200 flex justify-end space-x-3 bg-gray-50">
             {footer}
@@ -195,7 +195,9 @@ const Toast: React.FC<ToastProps> = ({ message, type, onClose }) => {
   const Icon = type === 'success' ? FaCheckCircle : FaExclamationCircle;
 
   return (
-    <div className={`fixed bottom-6 right-6 p-4 rounded-lg shadow-lg text-white flex items-center space-x-3 ${bgColor} z-50`}>
+    <div
+      className={`fixed bottom-6 right-6 p-4 rounded-lg shadow-lg text-white flex items-center space-x-3 ${bgColor} z-50`}
+    >
       <Icon size={20} />
       <span>{message}</span>
       <button onClick={onClose} className="ml-auto text-white hover:text-opacity-80">
@@ -232,7 +234,10 @@ const ConditionBuilder: React.FC<ConditionBuilderProps> = ({
       }
       return child;
     });
-    onUpdate({ ...conditionGroup, children: updatedChildren as (UICondition | UIConditionGroup)[] });
+    onUpdate({
+      ...conditionGroup,
+      children: updatedChildren as (UICondition | UIConditionGroup)[],
+    });
   };
 
   const handleNestedGroupUpdate = (id: string, updatedNestedGroup: UIConditionGroup) => {
@@ -242,7 +247,10 @@ const ConditionBuilder: React.FC<ConditionBuilderProps> = ({
       }
       return child;
     });
-    onUpdate({ ...conditionGroup, children: updatedChildren as (UICondition | UIConditionGroup)[] });
+    onUpdate({
+      ...conditionGroup,
+      children: updatedChildren as (UICondition | UIConditionGroup)[],
+    });
   };
 
   const addCondition = () => {
@@ -403,7 +411,11 @@ const RulesEngineUI: React.FC = () => {
   const [testResults, setTestResults] = useState<string[]>([]);
   const [testFacts, setTestFacts] = useState<{ [key: string]: any }>({}); // Facts for temporary testing
 
-  const [toast, setToast] = useState<ToastState>({ message: '', type: 'success', isVisible: false });
+  const [toast, setToast] = useState<ToastState>({
+    message: '',
+    type: 'success',
+    isVisible: false,
+  });
 
   // Load rules and facts from localStorage on mount
   useEffect(() => {
@@ -412,9 +424,9 @@ const RulesEngineUI: React.FC = () => {
       if (storedRules) {
         const parsedRules: Rule[] = JSON.parse(storedRules);
         // Ensure conditions have _id for UI if loaded from old format
-        const rulesWithIds = parsedRules.map(rule => ({
+        const rulesWithIds = parsedRules.map((rule) => ({
           ...rule,
-          conditions: addIdsToConditionsForUI(rule.conditions) as UIConditionGroup
+          conditions: addIdsToConditionsForUI(rule.conditions) as UIConditionGroup,
         }));
         setRules(rulesWithIds);
       }
@@ -432,9 +444,9 @@ const RulesEngineUI: React.FC = () => {
   useEffect(() => {
     try {
       // Clean rules before saving (remove _id from conditions)
-      const rulesToSave = rules.map(rule => ({
+      const rulesToSave = rules.map((rule) => ({
         ...rule,
-        conditions: cleanConditionsForEngine(rule.conditions) as EngineRule['conditions']
+        conditions: cleanConditionsForEngine(rule.conditions) as EngineRule['conditions'],
       }));
       localStorage.setItem('rules', JSON.stringify(rulesToSave));
       localStorage.setItem('facts', JSON.stringify(facts));
@@ -533,7 +545,7 @@ const RulesEngineUI: React.FC = () => {
 
   const handleSaveFacts = () => {
     // Basic validation for facts (e.g., ensure keys are not empty)
-    const invalidKeys = Object.keys(facts).filter(key => !key.trim());
+    const invalidKeys = Object.keys(facts).filter((key) => !key.trim());
     if (invalidKeys.length > 0) {
       showToast('Fact keys cannot be empty.', 'error');
       return;
@@ -587,7 +599,9 @@ const RulesEngineUI: React.FC = () => {
       }
     } catch (error) {
       console.error('Error during rule evaluation:', error);
-      setTestResults([`Error during rule evaluation: ${error instanceof Error ? error.message : String(error)}`]);
+      setTestResults([
+        `Error during rule evaluation: ${error instanceof Error ? error.message : String(error)}`,
+      ]);
     }
   };
 
@@ -603,9 +617,9 @@ const RulesEngineUI: React.FC = () => {
 
   const handleExport = () => {
     const data = {
-      rules: rules.map(rule => ({
+      rules: rules.map((rule) => ({
         ...rule,
-        conditions: cleanConditionsForEngine(rule.conditions) as EngineRule['conditions']
+        conditions: cleanConditionsForEngine(rule.conditions) as EngineRule['conditions'],
       })),
       facts: facts,
     };
@@ -709,16 +723,26 @@ const RulesEngineUI: React.FC = () => {
             </div>
 
             {rules.length === 0 ? (
-              <p className="text-gray-600 text-center py-8">No rules defined yet. Click "Create New Rule" to get started!</p>
+              <p className="text-gray-600 text-center py-8">
+                No rules defined yet. Click "Create New Rule" to get started!
+              </p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="min-w-full bg-white border border-gray-200 rounded-lg">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Rule Name</th>
-                      <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Conditions Summary</th>
-                      <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Event Type</th>
-                      <th className="py-3 px-4 text-right text-sm font-semibold text-gray-600 border-b border-gray-200">Actions</th>
+                      <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">
+                        Rule Name
+                      </th>
+                      <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">
+                        Conditions Summary
+                      </th>
+                      <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">
+                        Event Type
+                      </th>
+                      <th className="py-3 px-4 text-right text-sm font-semibold text-gray-600 border-b border-gray-200">
+                        Actions
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -727,7 +751,8 @@ const RulesEngineUI: React.FC = () => {
                         <td className="py-3 px-4 border-b border-gray-200">{rule.name}</td>
                         <td className="py-3 px-4 border-b border-gray-200 text-sm text-gray-600">
                           {/* Simple summary, could be more detailed */}
-                          {rule.conditions.operator === 'all' ? 'All' : 'Any'} of {rule.conditions.children.length} conditions
+                          {rule.conditions.operator === 'all' ? 'All' : 'Any'} of{' '}
+                          {rule.conditions.children.length} conditions
                         </td>
                         <td className="py-3 px-4 border-b border-gray-200">{rule.event.type}</td>
                         <td className="py-3 px-4 border-b border-gray-200 text-right space-x-2">
@@ -793,7 +818,10 @@ const RulesEngineUI: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {Object.entries(facts).map(([key, value]) => (
-                <div key={key} className="flex items-center space-x-3 p-3 border border-gray-200 rounded-md bg-gray-50">
+                <div
+                  key={key}
+                  className="flex items-center space-x-3 p-3 border border-gray-200 rounded-md bg-gray-50"
+                >
                   <input
                     type="text"
                     value={key}
@@ -853,7 +881,10 @@ const RulesEngineUI: React.FC = () => {
                 <FaDownload size={18} />
                 <span>Export All Data (JSON)</span>
               </button>
-              <label htmlFor="import-file" className="cursor-pointer px-6 py-3 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors flex items-center space-x-2 shadow-md w-full md:w-auto justify-center">
+              <label
+                htmlFor="import-file"
+                className="cursor-pointer px-6 py-3 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors flex items-center space-x-2 shadow-md w-full md:w-auto justify-center"
+              >
                 <FaUpload size={18} />
                 <span>Import Data (JSON)</span>
                 <input
@@ -866,7 +897,8 @@ const RulesEngineUI: React.FC = () => {
               </label>
             </div>
             <p className="text-sm text-gray-500 mt-4">
-              Import/Export will include all rules and facts. Importing will overwrite existing data.
+              Import/Export will include all rules and facts. Importing will overwrite existing
+              data.
             </p>
           </section>
         )}
@@ -917,7 +949,9 @@ const RulesEngineUI: React.FC = () => {
               <h3 className="text-lg font-semibold text-gray-700 mb-3">Conditions</h3>
               <ConditionBuilder
                 conditionGroup={editingRule.conditions}
-                onUpdate={(updatedGroup) => setEditingRule({ ...editingRule, conditions: updatedGroup })}
+                onUpdate={(updatedGroup) =>
+                  setEditingRule({ ...editingRule, conditions: updatedGroup })
+                }
                 availableFacts={availableFactsKeys}
               />
             </div>
@@ -926,7 +960,10 @@ const RulesEngineUI: React.FC = () => {
               <h3 className="text-lg font-semibold text-gray-700 mb-3">Event</h3>
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="eventType" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="eventType"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Event Type <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -934,14 +971,19 @@ const RulesEngineUI: React.FC = () => {
                     id="eventType"
                     value={editingRule.event.type}
                     onChange={(e) =>
-                      setEditingRule({ ...editingRule, event: { ...editingRule.event, type: e.target.value } })
+                      setEditingRule({
+                        ...editingRule,
+                        event: { ...editingRule.event, type: e.target.value },
+                      })
                     }
                     className="w-full p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
                     placeholder="e.g., fouledOut"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Event Parameters (Key-Value Pairs)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Event Parameters (Key-Value Pairs)
+                  </label>
                   <div className="space-y-3">
                     {Object.entries(editingRule.event.params || {}).map(([key, value]) => (
                       <div key={key} className="flex items-center space-x-3">
@@ -957,7 +999,10 @@ const RulesEngineUI: React.FC = () => {
                                 delete newParams[key];
                               }
                               newParams[newKey] = value;
-                              return { ...prevRule, event: { ...prevRule.event, params: newParams } };
+                              return {
+                                ...prevRule,
+                                event: { ...prevRule.event, params: newParams },
+                              };
                             });
                           }}
                           placeholder="Param Key"
@@ -971,7 +1016,10 @@ const RulesEngineUI: React.FC = () => {
                             setEditingRule((prevRule) => {
                               if (!prevRule) return null;
                               const newParams = { ...prevRule.event.params, [key]: val };
-                              return { ...prevRule, event: { ...prevRule.event, params: newParams } };
+                              return {
+                                ...prevRule,
+                                event: { ...prevRule.event, params: newParams },
+                              };
                             });
                           }}
                           placeholder="Param Value"
@@ -984,7 +1032,10 @@ const RulesEngineUI: React.FC = () => {
                               if (!prevRule) return null;
                               const newParams = { ...prevRule.event.params };
                               delete newParams[key];
-                              return { ...prevRule, event: { ...prevRule.event, params: newParams } };
+                              return {
+                                ...prevRule,
+                                event: { ...prevRule.event, params: newParams },
+                              };
                             })
                           }
                           className="p-2 text-red-600 hover:text-red-800 rounded-full hover:bg-red-100 transition-colors"
@@ -1002,7 +1053,10 @@ const RulesEngineUI: React.FC = () => {
                           const newParamKey = `param${Object.keys(prevRule.event.params || {}).length + 1}`;
                           return {
                             ...prevRule,
-                            event: { ...prevRule.event, params: { ...prevRule.event.params, [newParamKey]: '' } },
+                            event: {
+                              ...prevRule.event,
+                              params: { ...prevRule.event.params, [newParamKey]: '' },
+                            },
                           };
                         })
                       }
@@ -1044,7 +1098,8 @@ const RulesEngineUI: React.FC = () => {
       >
         <p className="text-gray-700">
           Are you sure you want to delete rule "
-          <span className="font-semibold">{ruleToDelete?.name}</span>"? This action cannot be undone.
+          <span className="font-semibold">{ruleToDelete?.name}</span>"? This action cannot be
+          undone.
         </p>
       </Modal>
 
@@ -1065,7 +1120,9 @@ const RulesEngineUI: React.FC = () => {
       >
         <div className="space-y-6">
           <div>
-            <h3 className="text-lg font-semibold text-gray-700 mb-3">Facts for Testing (Temporary)</h3>
+            <h3 className="text-lg font-semibold text-gray-700 mb-3">
+              Facts for Testing (Temporary)
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               {Object.entries(testFacts).map(([key, value]) => (
                 <div key={key} className="flex items-center space-x-2">
@@ -1119,7 +1176,11 @@ const RulesEngineUI: React.FC = () => {
 
       {/* Toast Notification */}
       {toast.isVisible && (
-        <Toast message={toast.message} type={toast.type} onClose={() => setToast((prev) => ({ ...prev, isVisible: false }))} />
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast((prev) => ({ ...prev, isVisible: false }))}
+        />
       )}
     </div>
   );

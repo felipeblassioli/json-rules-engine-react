@@ -1,10 +1,11 @@
-import { createRoot } from "react-dom/client";
-import { default as Component } from "./RulesEngineMain";
-import { StrictMode } from "react";
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import { default as Component } from './RulesEngineMain';
+import { StrictMode } from 'react';
 // Optionally: import your app's CSS
 // import "./styles.css";
 
-const elem = document.getElementById("root")!;
+const elem = document.getElementById('root')!;
 const app = (
   <StrictMode>
     <Component />
